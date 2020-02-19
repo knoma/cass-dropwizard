@@ -44,7 +44,7 @@ curl -v "localhost:9000/person/all"
 ```
 Query count
 ```shell script
-curl -v  "localhost:9000/person/all"
+curl -v  "localhost:9000/person/count"
 ```
 
 DELETE data
