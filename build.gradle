@@ -16,7 +16,7 @@ plugins {
     id 'groovy'
 
     id 'com.github.johnrengelman.shadow' version '5.2.0'
-    id "com.github.ben-manes.versions" version "0.27.0"
+    id "com.github.ben-manes.versions" version "0.28.0"
 }
 
 repositories {
@@ -39,7 +39,7 @@ targetCompatibility = 11
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
 //    implementation 'com.google.guava:guava:28.1-jre'
-    implementation ('io.dropwizard:dropwizard-core:2.0.1')  {
+    implementation ('io.dropwizard:dropwizard-core:2.0.7')  {
         exclude group: 'com.google.guava', module: 'guava'
     }
     implementation "io.dropwizard.modules:dropwizard-cassandra:1.4.0"
@@ -48,7 +48,7 @@ dependencies {
     implementation 'org.lz4:lz4-java:1.7.1'
 
     // Use the latest Groovy version for Spock testing
-    testImplementation 'org.codehaus.groovy:groovy-all:3.0.1'
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.3'
 
     // Use the awesome Spock testing and specification framework even with Java
     testImplementation 'org.spockframework:spock-core:2.0-M2-groovy-3.0'
