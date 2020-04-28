@@ -4,7 +4,7 @@ Simple REST Webservice using Dropwizard 2.0 and Cassandra Driver 3.x.
 For some sample service using Cassandra 4.2 driver please [checkout the Cassandra4 branch](https://github.com/knoma/cass-dropwizard/tree/Cassandra4)
 
 ###Requirements 
- - Cassandra 
+ - Postgres 
  - Java 11
  - Curl 
  
