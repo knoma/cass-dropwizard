@@ -1,11 +1,10 @@
 package com.knoma.web.resource;
 
-import com.knoma.web.dao.PersonAccessor;
 import com.codahale.metrics.annotation.Timed;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.mapping.MappingManager;
 import com.google.common.collect.ImmutableMap;
+import com.knoma.web.dao.PersonDao;
 import com.knoma.web.pojo.Person;
+import org.jdbi.v3.core.Jdbi;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -16,32 +15,29 @@ import java.util.UUID;
 @Path("/person")
 public class PersonResource {
 
-    private Session session;
-    private PersonAccessor personAccessor;
+    private final PersonDao personDao;
 
-    public PersonResource(Session session) {
-        this.session = session;
 
-        MappingManager manager = new MappingManager(session);
-        this.personAccessor = manager.createAccessor(PersonAccessor.class);
+    public PersonResource(Jdbi jdbi) {
+        this.personDao = jdbi.onDemand(PersonDao.class);
     }
 
     @GET
     @Timed
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Person getPerson(@PathParam("id") String id) {
-        System.out.println(personAccessor.getCount().one().getLong(0));
-        return personAccessor.getById(UUID.fromString(id)).one();
+    public Person getPerson(@PathParam("id") Long id) {
+        System.out.println(personDao.getCount());
+        return personDao.getById(id);
     }
 
     @DELETE
     @Timed
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Long>  removePerson(@PathParam("id") String id) {
-        personAccessor.delete(UUID.fromString(id));
-        return ImmutableMap.of("count", personAccessor.getCount().one().getLong(0));
+    public Map<String, Long> removePerson(@PathParam("id") Long id) {
+        personDao.delete(id);
+        return ImmutableMap.of("count", personDao.getCount());
     }
 
     @GET
@@ -49,7 +45,7 @@ public class PersonResource {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Person> getPersons() {
-        return personAccessor.getAll().all();
+        return personDao.getAll();
     }
 
     @GET
@@ -57,7 +53,7 @@ public class PersonResource {
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Long> getPersonCount() {
-        return ImmutableMap.of("count", personAccessor.getCount().one().getLong(0));
+        return ImmutableMap.of("count", personDao.getCount());
     }
 
     @POST
@@ -66,7 +62,7 @@ public class PersonResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes({MediaType.APPLICATION_JSON})
     public Person addPerson(Person person) {
-        personAccessor.save(person.getId(), person.getFirstName(), person.getLastName(), person.getEmail());
+        personDao.save(person.getId(), person.getFirstName(), person.getLastName(), person.getEmail());
         return person;
     }
 }

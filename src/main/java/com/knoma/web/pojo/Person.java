@@ -1,33 +1,21 @@
 package com.knoma.web.pojo;
 
-import com.datastax.driver.mapping.annotations.Column;
-import com.datastax.driver.mapping.annotations.PartitionKey;
-import com.datastax.driver.mapping.annotations.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jdbi.v3.core.mapper.reflect.ColumnName;
 
-import java.util.UUID;
 
-@Table(keyspace = "cass_drop", name = "person",
-        readConsistency = "QUORUM",
-        writeConsistency = "QUORUM",
-        caseSensitiveKeyspace = false,
-        caseSensitiveTable = false)
 public class Person {
-
-    @PartitionKey
-    private UUID id;
-
-    @Column(name = "first_name")
+    private Long id;
+    @ColumnName("first_name")
     private String firstName;
-
-    @Column(name = "last_name")
+    @ColumnName("last_name")
     private String lastName;
     private String email;
 
     public Person() {
     }
 
-    public Person(UUID id, String firstName, String lastName, String email) {
+    public Person(Long id, String firstName, String lastName, String email) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -35,11 +23,11 @@ public class Person {
     }
 
     @JsonProperty
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

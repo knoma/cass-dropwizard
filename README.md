@@ -10,7 +10,7 @@ For some sample service using Cassandra 4.2 driver please [checkout the Cassandr
  
 Apply keyspace and table from [cql folder](src/main/resources/cql/db.cql).
 ```shell script
-./cqlsh -f src/main/resources/cql/db.cql
+psql -f src/main/resources/psql/db.sql postgres
 ```
 
 Build app via gradle

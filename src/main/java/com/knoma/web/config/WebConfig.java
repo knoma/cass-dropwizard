@@ -2,7 +2,7 @@ package com.knoma.web.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
-import io.dropwizard.cassandra.CassandraFactory;
+import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.health.conf.HealthConfiguration;
 
 import javax.validation.Valid;
@@ -14,15 +14,24 @@ public class WebConfig extends Configuration {
 
     @NotEmpty
     private String version;
+
     @Valid
     @NotNull
-    @JsonProperty
-    private CassandraFactory cassandra;
-
+    private DataSourceFactory database = new DataSourceFactory();
     @Valid
     @NotNull
     @JsonProperty("health")
     private HealthConfiguration healthConfiguration = new HealthConfiguration();
+
+    @JsonProperty("database")
+    public DataSourceFactory getDataSourceFactory() {
+        return database;
+    }
+
+    @JsonProperty("database")
+    public void setDataSourceFactory(DataSourceFactory factory) {
+        this.database = factory;
+    }
 
     public HealthConfiguration getHealthConfiguration() {
         return healthConfiguration;
@@ -42,11 +51,4 @@ public class WebConfig extends Configuration {
         this.version = version;
     }
 
-    public CassandraFactory getCassandraFactory() {
-        return cassandra;
-    }
-
-    public void setCassandraFactory(final CassandraFactory cassandraConfig) {
-        this.cassandra = cassandraConfig;
-    }
 }
