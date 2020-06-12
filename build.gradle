@@ -39,12 +39,12 @@ targetCompatibility = 11
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
 //    implementation 'com.google.guava:guava:28.1-jre'
-    implementation ('io.dropwizard:dropwizard-core:2.0.7')  {
+    implementation ('io.dropwizard:dropwizard-core:2.0.10')  {
         exclude group: 'com.google.guava', module: 'guava'
     }
     implementation "io.dropwizard.modules:dropwizard-cassandra:1.4.0"
     implementation 'io.dropwizard.modules:dropwizard-health:1.5.0'
-    implementation 'com.datastax.cassandra:cassandra-driver-mapping:3.8.0'
+    implementation 'com.datastax.cassandra:cassandra-driver-mapping:3.9.0'
     implementation 'org.lz4:lz4-java:1.7.1'
 
     // Use the latest Groovy version for Spock testing

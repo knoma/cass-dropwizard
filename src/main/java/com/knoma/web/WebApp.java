@@ -6,6 +6,7 @@ import brave.propagation.ThreadLocalCurrentTraceContext;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.knoma.web.config.WebConfig;
+import com.knoma.web.dao.PersonDAO;
 import com.knoma.web.resource.PersonResource;
 import io.dropwizard.Application;
 import io.dropwizard.health.conf.HealthConfiguration;
@@ -13,8 +14,12 @@ import io.dropwizard.health.core.HealthCheckBundle;
 import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.glassfish.jersey.internal.inject.AbstractBinder;
 
+import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class WebApp extends Application<WebConfig> {
 
@@ -35,11 +40,22 @@ public class WebApp extends Application<WebConfig> {
         this.session = config.getCassandraFactory().build(env.metrics(), env.lifecycle(),
                 env.healthChecks(), tracing);
 
-        final PersonResource personResource = new PersonResource(session);
-        env.jersey().register(personResource);
-        env.healthChecks();
 
         env.jersey().register(new JsonProcessingExceptionMapper(true));
+
+        env.jersey().register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(session).to(Session.class);
+                bind(Executors.newCachedThreadPool()).to(ExecutorService.class);
+                bind(PersonDAO.class).to(PersonDAO.class).in(Singleton.class);
+            }
+        });
+
+
+        env.jersey().register(PersonResource.class);
+
+        env.healthChecks();
 
     }
 
