@@ -3,8 +3,8 @@ package com.knoma.web;
 import brave.Tracing;
 import brave.propagation.StrictScopeDecorator;
 import brave.propagation.ThreadLocalCurrentTraceContext;
-import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.knoma.web.config.WebConfig;
 import com.knoma.web.dao.PersonDAO;
 import com.knoma.web.resource.PersonResource;
@@ -16,10 +16,13 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class WebApp extends Application<WebConfig> {
 
@@ -40,23 +43,33 @@ public class WebApp extends Application<WebConfig> {
         this.session = config.getCassandraFactory().build(env.metrics(), env.lifecycle(),
                 env.healthChecks(), tracing);
 
-
         env.jersey().register(new JsonProcessingExceptionMapper(true));
 
         env.jersey().register(new AbstractBinder() {
             @Override
             protected void configure() {
                 bind(session).to(Session.class);
-                bind(Executors.newCachedThreadPool()).to(ExecutorService.class);
+                bind(provideDataWorkerExecutor()).to(ExecutorService.class).named("ResourceExecutor");
                 bind(PersonDAO.class).to(PersonDAO.class).in(Singleton.class);
             }
         });
-
 
         env.jersey().register(PersonResource.class);
 
         env.healthChecks();
 
+    }
+
+    @Singleton
+    @Named("ResourceExecutor")
+    private ExecutorService provideDataWorkerExecutor() {
+        // executor with metrics
+        ThreadPoolExecutor exec = new ThreadPoolExecutor(
+                50, 60,
+                10, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(100), new ThreadFactoryBuilder().setNameFormat("kthread-%d").build());
+
+        return exec;
     }
 
     @Override
